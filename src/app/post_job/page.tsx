@@ -314,6 +314,10 @@ export default function JobPosting() {
                                 ) : 'N/A'}
                             </TableCell>
                             <TableCell>{app.linkedinConnection}</TableCell>
+                            <TableCell>{app.linkedinMessage}</TableCell>
+                            <TableCell>{app.atsScore}</TableCell>
+                            <TableCell>{app.email1}</TableCell>
+                            <TableCell>{app.recruiterComments}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
