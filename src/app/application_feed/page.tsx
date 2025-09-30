@@ -116,7 +116,7 @@ export default function ApplicationFeedPage() {
                         <TableCell>michael.b@example.com</TableCell>
                         <TableCell>linkedin.com/in/michaelbrown</TableCell>
                         <TableCell>1st</TableCell>
-                        <TableCell>Hi Michael, let's connect.</TableCell>
+                        <TableCell>Hi Michael, let&apos;s connect.</TableCell>
                         <TableCell>95</TableCell>
                         <TableCell>Sent</TableCell>
                         <TableCell>Excellent background.</TableCell>
