@@ -291,20 +291,30 @@ export default function JobPosting() {
                 <TableCaption>This is the data received from the job post.</TableCaption>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Job</TableHead>
                         <TableHead>Job Board</TableHead>
-                        <TableHead>Email</TableHead>
+                        <TableHead>Inbound/Outbound</TableHead>
+                        <TableHead>Job</TableHead>
+                        <TableHead>Location</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Resume</TableHead>
+                        <TableHead>Candidate Email</TableHead>
                         <TableHead>LinkedIn</TableHead>
                         <TableHead>Connection</TableHead>
+                        <TableHead>LinkedIn First Message</TableHead>
+                        <TableHead>ATS Score</TableHead>
+                        <TableHead>Email 1</TableHead>
+                        <TableHead>Recruiter Comments</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {applications.map((app) => (
                         <TableRow key={app.id}>
-                            <TableCell>{app.name}</TableCell>
-                            <TableCell>{app.job}</TableCell>
                             <TableCell>{app.jobBoard}</TableCell>
+                            <TableCell>{app.inboundOutbound}</TableCell>
+                            <TableCell>{app.job}</TableCell>
+                            <TableCell>{app.location}</TableCell>
+                            <TableCell>{app.name}</TableCell>
+                            <TableCell>{app.resume}</TableCell>
                             <TableCell>{app.candidateEmail}</TableCell>
                             <TableCell>
                                 {app.linkedinUrl !== 'N/A' ? (
