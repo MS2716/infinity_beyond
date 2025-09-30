@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export default function job_posting() {
+export default function JobPosting() {
   const [formData, setFormData] = React.useState({
     jobTitle: '',
     jobCode: 'IN106',
