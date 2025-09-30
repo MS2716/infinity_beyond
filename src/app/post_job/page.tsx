@@ -1,5 +1,14 @@
 'use client';
 import React from 'react';
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 
 interface SalaryDetails {
   currency: string;
@@ -19,6 +28,40 @@ interface FormData {
   industry: string;
   salaryDetails: SalaryDetails;
   jobDescription: string;
+}
+
+// --- Interfaces from application_feed ---
+interface Application {
+    id: number;
+    jobBoard: string;
+    inboundOutbound: 'Inbound' | 'Outbound';
+    job: string;
+    location: string;
+    name: string;
+    resume: string;
+    candidateEmail: string;
+    linkedinUrl: string;
+    linkedinConnection: string;
+    linkedinMessage: string;
+    atsScore: number | string;
+    email1: 'Sent' | 'Not Sent';
+    recruiterComments: string;
+}
+
+interface ApiResponseItem {
+    'Job Board'?: string;
+    'Inbound |Outbound'?: 'Inbound' | 'Outbound';
+    'Job'?: string;
+    'Location'?: string;
+    'Name'?: string;
+    'Resume'?: string;
+    'Candidate Email'?: string;
+    'Linked Url'?: string;
+    'LinkedIn Connection'?: string;
+    'LinkedIn First Message'?: string;
+    'ATS Score'?: number | string;
+    'Email 1'?: 'Sent' | 'Not Sent';
+    'Recruiter Comments'?: string;
 }
 
 type SalaryDetailKey = keyof SalaryDetails;
@@ -43,6 +86,7 @@ export default function JobPosting() {
   })
   const [responseMessage, setResponseMessage] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+  const [applications, setApplications] = React.useState<Application[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -67,6 +111,7 @@ export default function JobPosting() {
     e.preventDefault();
     setIsLoading(true);
     setResponseMessage('');
+    setApplications([]); // Clear previous results on new submission
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     if (!apiUrl) {
@@ -87,13 +132,33 @@ export default function JobPosting() {
         body: JSON.stringify(formData)
       });
 
-      const responseBody = await response.text(); // Read body as text to handle both JSON and plain text
-
       if (response.ok) {
-        console.log('Job created successfully:', responseBody);
-        setResponseMessage(`Success: ${responseBody}`);
+        const data: ApiResponseItem[] = await response.json();
+        console.log('Job created successfully, received data:', data);
+
+        const transformedData: Application[] = data.map((item, index) => ({
+            id: index,
+            jobBoard: item['Job Board'] ?? 'N/A',
+            inboundOutbound: item['Inbound |Outbound'] ?? 'Inbound',
+            job: item['Job'] ?? 'N/A',
+            location: item['Location'] ?? 'N/A',
+            name: item['Name'] ?? 'N/A',
+            resume: item['Resume'] ?? 'N/A',
+            candidateEmail: item['Candidate Email'] ?? 'N/A',
+            linkedinUrl: item['Linked Url'] ?? 'N/A',
+            linkedinConnection: item['LinkedIn Connection'] ?? 'N/A',
+            linkedinMessage: item['LinkedIn First Message'] ?? 'N/A',
+            atsScore: item['ATS Score'] ?? 'N/A',
+            email1: item['Email 1'] ?? 'Not Sent',
+            recruiterComments: item['Recruiter Comments'] ?? 'N/A',
+        }));
+
+        setApplications(transformedData);
+        setResponseMessage('Success! Application feed updated below.');
+
       } else {
         // Log the status and the response body for more details
+        const responseBody = await response.text();
         console.error('Failed to create job:', response.status, responseBody);
         setResponseMessage(`Error ${response.status}: ${responseBody}`);
       }
@@ -109,7 +174,7 @@ export default function JobPosting() {
     <div>
       <main className="p-8">
         <div className="mt-4 border-2 p-8 rounded-2xl shadow w-full max-w-4xl mx-auto">
-          <h2 className="text-[var(--reco-green-0)] text-center text-3xl font-semibold mb-8">Let&apos;s Create a Job Posting</h2>
+          <h2 className="text-[var(--reco-green-0)] text-center text-3xl font-semibold mb-8">Let's Create a Job Posting</h2>
           <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
             {/* Job Title */}
             <div className="md:col-span-2">
@@ -218,6 +283,44 @@ export default function JobPosting() {
       </form>
         </div>
       </main>
+
+      {applications.length > 0 && (
+        <section className="p-8">
+            <h2 className="text-2xl font-bold text-[var(--reco-green-20)] mb-4">Application Feed Result</h2>
+            <Table>
+                <TableCaption>This is the data received from the job post.</TableCaption>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Job</TableHead>
+                        <TableHead>Job Board</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>LinkedIn</TableHead>
+                        <TableHead>Connection</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {applications.map((app) => (
+                        <TableRow key={app.id}>
+                            <TableCell>{app.name}</TableCell>
+                            <TableCell>{app.job}</TableCell>
+                            <TableCell>{app.jobBoard}</TableCell>
+                            <TableCell>{app.candidateEmail}</TableCell>
+                            <TableCell>
+                                {app.linkedinUrl !== 'N/A' ? (
+                                    <a href={app.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                        Profile
+                                    </a>
+                                ) : 'N/A'}
+                            </TableCell>
+                            <TableCell>{app.linkedinConnection}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </section>
+      )}
+
     </div>
   )
 }
