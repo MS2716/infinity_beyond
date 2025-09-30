@@ -1,14 +1,5 @@
 'use client';
 import React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 
 interface SalaryDetails {
   currency: string;
@@ -28,40 +19,6 @@ interface FormData {
   industry: string;
   salaryDetails: SalaryDetails;
   jobDescription: string;
-}
-
-// --- Interfaces from application_feed ---
-interface Application {
-    id: number;
-    jobBoard: string;
-    inboundOutbound: 'Inbound' | 'Outbound';
-    job: string;
-    location: string;
-    name: string;
-    resume: string;
-    candidateEmail: string;
-    linkedinUrl: string;
-    linkedinConnection: string;
-    linkedinMessage: string;
-    atsScore: number | string;
-    email1: 'Sent' | 'Not Sent';
-    recruiterComments: string;
-}
-
-interface ApiResponseItem {
-    'Job Board'?: string;
-    'Inbound |Outbound'?: 'Inbound' | 'Outbound';
-    'Job'?: string;
-    'Location'?: string;
-    'Name'?: string;
-    'Resume'?: string;
-    'Candidate Email'?: string;
-    'Linked Url'?: string;
-    'LinkedIn Connection'?: string;
-    'LinkedIn First Message'?: string;
-    'ATS Score'?: number | string;
-    'Email 1'?: 'Sent' | 'Not Sent';
-    'Recruiter Comments'?: string;
 }
 
 type SalaryDetailKey = keyof SalaryDetails;
@@ -86,8 +43,6 @@ export default function JobPosting() {
   })
   const [responseMessage, setResponseMessage] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const [applications, setApplications] = React.useState<Application[]>([]);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -112,8 +67,6 @@ export default function JobPosting() {
     e.preventDefault();
     setIsLoading(true);
     setResponseMessage('');
-    setApplications([]); // Clear previous results on new submission
-    setIsModalOpen(false);
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     if (!apiUrl) {
@@ -134,33 +87,13 @@ export default function JobPosting() {
         body: JSON.stringify(formData)
       });
 
+      const responseBody = await response.text(); // Read body as text to handle both JSON and plain text
+
       if (response.ok) {
-        const data: ApiResponseItem[] = await response.json();
-        console.log('Job created successfully, received data:', data);
-
-        const transformedData: Application[] = data.map((item, index) => ({
-            id: index,
-            jobBoard: item['Job Board'] ?? 'N/A',
-            inboundOutbound: item['Inbound |Outbound'] ?? 'Inbound',
-            job: item['Job'] ?? 'N/A',
-            location: item['Location'] ?? 'N/A',
-            name: item['Name'] ?? 'N/A',
-            resume: item['Resume'] ?? 'N/A',
-            candidateEmail: item['Candidate Email'] ?? 'N/A',
-            linkedinUrl: item['Linked Url'] ?? 'N/A',
-            linkedinConnection: item['LinkedIn Connection'] ?? 'N/A',
-            linkedinMessage: item['LinkedIn First Message'] ?? 'N/A',
-            atsScore: item['ATS Score'] ?? 'N/A',
-            email1: item['Email 1'] ?? 'Not Sent',
-            recruiterComments: item['Recruiter Comments'] ?? 'N/A',
-        }));
-
-        setApplications(transformedData);
-        setIsModalOpen(true); // Open the modal on success
-
+        console.log('Job created successfully:', responseBody);
+        setResponseMessage(`Success: ${responseBody}`);
       } else {
         // Log the status and the response body for more details
-        const responseBody = await response.text();
         console.error('Failed to create job:', response.status, responseBody);
         setResponseMessage(`Error ${response.status}: ${responseBody}`);
       }
@@ -254,9 +187,6 @@ export default function JobPosting() {
                 <div>
                   <select name="currency" value={formData.salaryDetails.currency} onChange={handleChange} className="mt-1 block w-full border-2 border-[var(--reco-green-40)] p-2 rounded">
                     <option>USD - United States Dollar</option>
-                    <option>EUR - Euro</option>
-                    <option>GBP - British Pound</option>
-                    <option>INR - Indian Rupee</option>
                   </select>
                 </div>
                 <input type="number" placeholder="Minimum Salary" name="minSalary" value={formData.salaryDetails.minSalary} onChange={handleChange} className="mt-1 block w-full border-2 border-[var(--reco-green-40)] p-2 rounded" />
@@ -288,55 +218,6 @@ export default function JobPosting() {
       </form>
         </div>
       </main>
-
-      {isModalOpen && applications.length > 0 && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-          <div className="bg-[var(--reco-green-100)] p-6 md:p-8 rounded-lg shadow-2xl max-w-5xl w-full relative max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-[var(--reco-green-20)]">Application Feed Result</h2>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-600 hover:text-black text-3xl font-bold"
-                aria-label="Close modal"
-              >
-                &times;
-              </button>
-            </div>
-            <div className="overflow-x-auto">
-              <Table>
-                  <TableCaption>This is the data received from the job post.</TableCaption>
-                  <TableHeader>
-                      <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Job</TableHead>
-                          <TableHead>Job Board</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>LinkedIn</TableHead>
-                          <TableHead>Connection</TableHead>
-                      </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                      {applications.map((app) => (
-                          <TableRow key={app.id}>
-                              <TableCell>{app.name}</TableCell>
-                              <TableCell>{app.job}</TableCell>
-                              <TableCell>{app.jobBoard}</TableCell>
-                              <TableCell>{app.candidateEmail}</TableCell>
-                              <TableCell>
-                                  {app.linkedinUrl !== 'N/A' ? (
-                                      <a href={app.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Profile</a>
-                                  ) : 'N/A'}
-                              </TableCell>
-                              <TableCell>{app.linkedinConnection}</TableCell>
-                          </TableRow>
-                      ))}
-                  </TableBody>
-              </Table>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   )
 }
