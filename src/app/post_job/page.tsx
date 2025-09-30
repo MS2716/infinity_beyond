@@ -5,7 +5,7 @@ export default function job_posting() {
     <div>
       <main className="p-8">
         <div className="mt-4 border-2 p-8 rounded-2xl shadow w-full max-w-4xl mx-auto">
-          <h2 className="text-[var(--reco-green-0)] text-center text-3xl font-semibold mb-8">Let's Create a Job Posting</h2>
+          <h2 className="text-[var(--reco-green-0)] text-center text-3xl font-semibold mb-8">Let&apos;s Create a Job Posting</h2>
           <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Job Title */}
             <div className="md:col-span-2">
