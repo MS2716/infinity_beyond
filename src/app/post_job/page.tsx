@@ -252,6 +252,10 @@ export default function JobPosting() {
                 <div>
                   <select name="currency" value={formData.salaryDetails.currency} onChange={handleChange} className="mt-1 block w-full border-2 border-[var(--reco-green-40)] p-2 rounded">
                     <option>USD - United States Dollar</option>
+                    <option>EUR - Europe euros</option>
+                    <option>IND - India Rupee</option>
+                    <option>CNY - China yen</option>
+                    <option>KRW - Korean won</option>
                   </select>
                 </div>
                 <input type="number" placeholder="Minimum Salary" name="minSalary" value={formData.salaryDetails.minSalary} onChange={handleChange} className="mt-1 block w-full border-2 border-[var(--reco-green-40)] p-2 rounded" />
